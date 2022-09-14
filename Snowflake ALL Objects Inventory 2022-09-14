@@ -1,0 +1,386 @@
+-- create new database if necessary
+create or replace database OBJECT_REVIEW;
+-- use database created above, or replace below 
+use schema OBJECT_REVIEW.PUBLIC;
+
+-- create temporary tables for Objects:
+-- Streams, Security Integrations, Storage Integrations, Materialized Views, External Tables, Network Polices, File Formats, External Functions, Shares, Session Polices, Resource Monitors, Notification Integrations, API Integrations, Connections, Replication Groups, Failover Groups
+
+-- create temp table for STREAMS
+show streams in account;
+create or replace temporary table STREAMS
+as select 'STREAMS' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+    
+-- create temp table for SECURITY INTEGRATIONS
+show security integrations;
+create or replace temporary table SECURITY_INTEGRATIONS
+as select 'SECURITY_INTEGRATIONS' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+    
+-- create temp table for STORAGE INTEGRATIONS
+show storage integrations;
+create or replace temporary table STORAGE_INTEGRATIONS
+as select 'STORAGE_INTEGRATIONS' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+    
+-- create temp table for MATERIALIZED VIEWS
+show materialized views in account;
+create or replace temporary table MATERIALIZED_VIEWS
+as select 'MATERIALIZED_VIEWS' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+
+-- create temp table for EXTERNAL TABLES
+show external tables in account;
+create or replace temporary table EXTERNAL_TABLES
+as select 'EXTERNAL_TABLES' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+    
+-- create temp table for NETWORK POLICIES
+show network policies in account;
+create or replace temporary table NETWORK_POLICIES
+as select 'NETWORK_POLICIES' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+
+--create temp table for FILE FORMATS    
+show file formats;
+create or replace temporary table FILE_FORMATS
+as select 'FILE_FORMATS' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+
+--create temp table for EXTERNAL FUNCTIONS   
+show external functions;
+create or replace temporary table EXTERNAL_FUNCTIONS
+as select 'EXTERNAL_FUNCTIONS' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+
+--create temp table for SHARES  
+show shares;
+create or replace temporary table SHARES
+as select 'SHARES' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+
+--create temp table for SESSION POLICIES   
+show session policies;
+create or replace temporary table SESSION_POLICIES
+as select 'SESSION_POLICIES' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+
+--create temp table for RESOURCE MONITORS  
+show resource monitors;
+create or replace temporary table RESOURCE_MONITORS
+as select 'RESOURCE_MONITORS' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+
+--create temp table for NOTIFICATION INTEGRATIONS   
+show notification integrations;
+create or replace temporary table NOTIFICATION_INTEGRATIONS
+as select 'NOTIFICATION_INTEGRATIONS' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+
+--create temp table for API INTEGRATIONS  
+show api integrations;
+create or replace temporary table API_INTEGRATIONS
+as select 'API_INTEGRATIONS' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+
+--create temp table for CONNECTIONS   
+show connections;
+create or replace temporary table CONNECTIONS
+as select 'CONNECTIONS' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+
+--create temp table for REPLICATION GROUPS  
+show replication groups;
+create or replace temporary table REPLICATION_GROUPS
+as select 'REPLICATION_GROUPS' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+
+--create temp table for FAILOVER GROUPS   
+show failover groups;
+create or replace temporary table FAILOVER_GROUPS
+as select 'FAILOVER_GROUPS' as object_type,
+"name" as object_name
+    from table(result_scan(last_query_id()));
+
+-- the next block of code will union all other objects with those above
+-- DATABASES, SCHEMAS, TABLES, VIEWS, STAGES, PIPES, FUNCTIONS/SPROCS, FILE FORMATS, SEQUENCES, MASKING POLICIES, ROW ACCESS POLICIES, TAGS, ROLES, USERS, WAREHOUSES, TASKS
+-- all current databases
+select 
+
+   'DATABASE' as object_type
+
+  , database_name as object_name
+
+from snowflake.account_usage.databases
+
+where deleted is null
+union 
+
+-- all current schemas
+select 
+
+   'SCHEMA' as object_type
+
+  , schema_name as object_name
+
+from snowflake.account_usage.schemata
+
+where deleted is null
+union
+
+-- all current tables
+select 
+
+   'TABLE' as object_type
+
+  , table_name as object_name
+
+from snowflake.account_usage.tables
+
+where deleted is null
+
+  and table_type = 'BASE TABLE'
+union
+
+-- all current views
+select 
+
+   'VIEW' as object_type
+
+  , table_name as object_name
+
+from snowflake.account_usage.views
+
+where deleted is null
+union
+
+-- all current stages
+select 
+
+   'STAGE' as object_type
+
+  , stage_name as object_name
+
+from snowflake.account_usage.stages
+
+where deleted is null
+union
+
+-- all current pipes
+select 
+
+   'PIPE' as object_type
+
+  , pipe_name as object_name
+
+from snowflake.account_usage.pipes
+
+where deleted is null
+union
+
+-- all current functions and procedures 
+select 
+
+   'FUNCTION_OR_SPROC' as object_type
+
+  , function_name as object_name
+
+from snowflake.account_usage.functions
+
+where deleted is null
+union
+
+-- all current file formats 
+select 
+
+   'FILE_FORMAT' as object_type
+
+  , file_format_name as object_name
+
+from snowflake.account_usage.file_formats
+
+where deleted is null
+union
+
+-- all current file formats 
+select 
+
+   'SEQUENCES' as object_type
+
+  , sequence_name as object_name
+
+from snowflake.account_usage.sequences
+
+where deleted is null
+union
+
+-- all current masking policies (column)
+
+select 
+
+   'MASKING_POLICY' as object_type
+
+  , policy_name as object_name
+
+from snowflake.account_usage.masking_policies
+
+where deleted is null
+union
+
+-- all current row access policies
+select 
+
+   'ROW_ACCESS_POLICY' as object_type
+
+  , policy_name as object_name
+
+from snowflake.account_usage.row_access_policies
+
+where deleted is null
+union
+
+-- all current tags
+select 
+
+   'TAG' as object_type
+
+  , tag_name as object_name
+
+from snowflake.account_usage.tags
+
+where deleted is null
+
+union
+-- all current views
+
+select 
+
+   'ROLE' as object_type
+
+  , name as object_name
+
+from snowflake.account_usage.roles
+
+where deleted_on is null
+
+union
+ 
+
+-- all current users
+
+select 
+
+   'USER' as object_type
+
+  , name as object_name
+
+from snowflake.account_usage.users
+
+where deleted_on is null
+
+union
+
+-- all current warehouses
+
+select distinct
+
+   'WAREHOUSE' as object_type
+
+  , warehouse_name as object_name
+
+from snowflake.account_usage.warehouse_events_history
+
+union
+
+-- all current tasks
+
+select distinct
+
+   'TASK' as object_type
+
+  , name as object_name
+
+from snowflake.account_usage.task_history
+
+union
+
+select * from object_review.public.streams
+
+union 
+
+select * from object_review.public.storage_integrations
+
+union 
+
+select * from object_review.public.security_integrations
+
+union 
+
+select * from object_review.public.materialized_views
+
+union 
+
+select * from object_review.public.external_tables
+
+union 
+
+select * from object_review.public.network_policies
+
+union 
+
+select * from object_review.public.file_formats
+
+union 
+
+select * from object_review.public.external_functions
+
+union 
+
+select * from object_review.public.shares
+
+union 
+
+select * from object_review.public.session_policies
+
+union 
+
+select * from object_review.public.resource_monitors
+
+union 
+
+select * from object_review.public.notification_integrations
+
+union 
+
+select * from object_review.public.api_integrations
+
+union 
+
+select * from object_review.public.connections
+
+union 
+
+select * from object_review.public.replication_groups
+
+union 
+
+select * from object_review.public.failover_groups
+
+order by object_type
+    , object_name;
